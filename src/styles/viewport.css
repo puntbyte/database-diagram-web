@@ -1,0 +1,117 @@
+/* web/src/styles/viewport.css */
+
+#app {
+  width: 100vw; height: 100vh;
+  overflow: hidden; position: relative;
+  --zoom: 1; --pan-x: 0px; --pan-y: 0px; --grid-size: 20px;
+  --field-note-max-lines: 2; --table-note-max-lines: 2;
+}
+
+.diagram-canvas {
+  width: 100%; height: 100%;
+  transform-origin: 0 0;
+  position: relative;
+  overflow: visible;
+}
+
+/* ── Cursor management ────────────────────────────────────────────────────── */
+
+.diagram-canvas.pannable { cursor: grab; }
+.diagram-canvas.panning  { cursor: grabbing; }
+
+body.entity-dragging,
+body.entity-dragging * { cursor: grabbing !important; }
+
+body.entity-resizing,
+body.entity-resizing * { cursor: se-resize !important; }
+
+.db-table-header        { cursor: grab; }
+.db-table-header:active { cursor: grabbing; }
+.resize-handle          { cursor: se-resize; }
+
+/* ── Grid ─────────────────────────────────────────────────────────────────── */
+
+#app.grid-visible {
+  background-image:
+      linear-gradient(to right,  var(--axis-line) 2px, transparent 2px),
+      linear-gradient(to bottom, var(--axis-line) 2px, transparent 2px),
+      linear-gradient(to right,  var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-repeat: no-repeat, no-repeat, repeat, repeat;
+  background-position:
+      var(--pan-x) 0, 0 var(--pan-y),
+      var(--pan-x) var(--pan-y), var(--pan-x) var(--pan-y);
+  background-size:
+      2px 100%, 100% 2px,
+      calc(var(--grid-size) * var(--zoom)) calc(var(--grid-size) * var(--zoom)),
+      calc(var(--grid-size) * var(--zoom)) calc(var(--grid-size) * var(--zoom));
+}
+
+/* ── Note visibility ──────────────────────────────────────────────────────── */
+
+.field-note {
+  -webkit-line-clamp: var(--field-note-max-lines);
+  max-height: calc(1.3em * var(--field-note-max-lines));
+}
+.table-note {
+  -webkit-line-clamp: var(--table-note-max-lines);
+  max-height: calc(1.3em * var(--table-note-max-lines));
+}
+#app.hide-field-notes .field-note { display: none; }
+#app.hide-table-notes .table-note { display: none; }
+
+/* ── Semantic zoom ────────────────────────────────────────────────────────── */
+
+/* Animate the collapse/expand only while the transitioning class is present
+ * (added by ViewportStateManager for 300ms around the threshold crossing). */
+.diagram-canvas.semantic-zoom-transitioning .db-table {
+  transition: min-height 0.3s ease;
+}
+
+/* Hide rows so the table collapses to the overlay representation. */
+.diagram-canvas.semantic-zoom .db-row {
+  display: none;
+}
+
+/* FIX: Keep the original saved width (do NOT set width: fit-content).
+ * Only override height so the box is tall enough to show the table name
+ * and meta line clearly.  The semantic-overlay is position:absolute and
+ * fills the table via top/left/right/bottom:-1px, so its size matches.
+ *
+ * 80px gives comfortable room for:
+ *   • table name  (~20px)
+ *   • meta line   (~16px)
+ *   • top+bottom padding
+ * Adjust via the --overlay-min-height custom property if needed. */
+.diagram-canvas.semantic-zoom .db-table {
+  min-height: 80px;
+}
+
+/* Round the bottom of the header so it looks complete when rows are hidden. */
+.diagram-canvas.semantic-zoom .db-table-header {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* ── Layers ────────────────────────────────────────────────────────────────── */
+
+.entity-layer {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1; overflow: visible;
+  pointer-events: none;
+}
+.entity-layer > * { pointer-events: auto; }
+
+/* ── Error ─────────────────────────────────────────────────────────────────── */
+
+.diagram-error {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--table-bg); border: 1px solid var(--table-border);
+  border-radius: 8px; padding: 24px; text-align: center; max-width: 400px;
+}
+.diagram-error h3 { color: #dc2626; margin: 0 0 8px; font-size: 16px; }
+.diagram-error p  { color: var(--text-secondary); margin: 0; font-size: 14px; }
+
+body.entity-dragging *, body.entity-resizing * { user-select: none; }

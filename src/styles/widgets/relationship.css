@@ -1,0 +1,316 @@
+/* web/src/styles/widgets/relationship.css */
+
+.relationship-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+}
+
+.relationship-group {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* ── Line layers ────────────────────────────────────────────────────────────── */
+
+.relation-hit-area {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 20px;
+}
+
+.relation-line-base {
+  fill: none;
+  stroke: var(--line-color);
+  stroke-width: 2px;
+  stroke-linecap: round;
+  transition: stroke 0.3s, stroke-width 0.3s;
+}
+
+.relation-line-flow {
+  fill: none;
+  stroke: var(--header-bg);
+  stroke-width: 2px;
+  stroke-linecap: round;
+  stroke-dasharray: 15 150;
+  opacity: 0.4;
+  animation: flowAnimation 5s linear infinite;
+}
+
+/* ── Overlay lines ──────────────────────────────────────────────────────────
+ * FIX: vector-effect:non-scaling-stroke keeps visual thickness constant at
+ * any zoom level (the canvas has a CSS transform, which normally scales strokes).
+ * stroke-width is set to a screen-pixel value that looks right at all zoom levels.
+ * Note: vector-effect is also set programmatically in relationship-renderer.ts
+ * for reliability; the CSS rule is a belt-and-suspenders backup.
+ */
+.relationship-group.overlay .relation-line-base,
+.relationship-group.overlay .relation-line-flow {
+  vector-effect: non-scaling-stroke;
+  stroke-width: 2px;
+}
+
+/* ── Animations ─────────────────────────────────────────────────────────────── */
+
+@keyframes flowAnimation {
+  to {
+    stroke-dashoffset: 165;
+  }
+}
+
+@keyframes continuousFlow {
+  to {
+    stroke-dashoffset: 24;
+  }
+}
+
+/* ── Hover / highlight ──────────────────────────────────────────────────────── */
+
+.relationship-group.highlighted .relation-line-base {
+  stroke: var(--header-bg);
+  stroke-width: 3px;
+  opacity: 0.5;
+}
+
+.relationship-group.highlighted .relation-line-flow {
+  opacity: 1;
+  stroke-width: 3px;
+  stroke-dasharray: 12 12;
+  animation: continuousFlow 0.8s linear infinite;
+  filter: drop-shadow(0 0 4px var(--header-bg));
+}
+
+/* ── Anchors ────────────────────────────────────────────────────────────────── */
+
+.anchor-port {
+  fill: var(--bg-color);
+  stroke: var(--line-color);
+  stroke-width: 2px;
+  transition: all 0.3s;
+}
+
+.anchor-port.highlighted {
+  stroke: var(--header-bg);
+  fill: var(--header-bg);
+  r: 5px;
+  filter: drop-shadow(0 0 3px var(--header-bg));
+}
+
+/* ── Labels ─────────────────────────────────────────────────────────────────── */
+
+.label-bg {
+  fill: var(--bg-color);
+  stroke: var(--table-border);
+  transition: all 0.3s;
+}
+
+.relationship-group.highlighted .label-bg {
+  stroke: var(--header-bg);
+  fill: #fff;
+}
+
+.relation-label-text {
+  font-size: 10px;
+  font-weight: 700;
+  fill: var(--text-secondary);
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+.relationship-group.highlighted .relation-label-text {
+  fill: var(--header-bg);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   FIELD BADGE — custom-type  (new, alongside existing .badge styles in field.css)
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.badge.custom-type {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid rgba(194, 65, 12, .15);
+}
+
+body.dark .badge.custom-type {
+  background: #431407;
+  color: #fdba74;
+  border-color: #7c2d12;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   TOOLBAR LEGEND POPUP
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.toolbar-separator {
+  width: 1px;
+  height: 20px;
+  background: var(--table-border);
+  flex-shrink: 0;
+}
+
+.toolbar-legend-popup {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: 220px;
+  background: var(--table-bg);
+  border: 1px solid var(--table-border);
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+  z-index: 2000;
+  font-size: 12px;
+  color: var(--text-primary);
+
+  /* Hidden by default */
+  display: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity .15s ease, transform .15s ease;
+  pointer-events: none;
+}
+
+.toolbar-legend-popup--open {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.legend-title {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+
+.legend-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-secondary);
+  margin: 8px 0 4px;
+}
+
+.legend-divider {
+  height: 1px;
+  background: var(--table-border);
+  margin: 8px 0;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  font-size: 11px;
+  color: var(--text-primary);
+}
+
+/* Colored dot for key types */
+.legend-key-dot {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.pk-color {
+  color: var(--icon-pk);
+}
+
+.fk-color {
+  color: var(--icon-fk);
+}
+
+.pkfk-color {
+  color: var(--icon-pk-fk);
+}
+
+/* Badge chips inside legend (re-use same styles as in table) */
+.legend-badge {
+  font-size: 8px;
+  height: 14px;
+  min-width: 28px;
+  padding: 0 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.legend-badge.unique {
+  background: #f3e8ff;
+  color: #7e22ce;
+  border: 1px solid rgba(126, 34, 206, .15);
+}
+
+.legend-badge.not-null {
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid rgba(75, 85, 99, .15);
+}
+
+.legend-badge.enum {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid rgba(4, 120, 87, .15);
+}
+
+.legend-badge.custom-type {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid rgba(194, 65, 12, .15);
+}
+
+/* Cardinality chip */
+.legend-card {
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'SF Mono', monospace;
+  background: rgba(150, 150, 150, .1);
+  border-radius: 4px;
+  padding: 1px 5px;
+  min-width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Dark mode */
+body.dark .toolbar-legend-popup {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+}
+
+body.dark .legend-badge.unique {
+  background: #3b0764;
+  color: #d8b4fe;
+  border-color: #581c87;
+}
+
+body.dark .legend-badge.not-null {
+  background: #374151;
+  color: #e5e7eb;
+  border-color: #4b5563;
+}
+
+body.dark .legend-badge.enum {
+  background: #064e3b;
+  color: #6ee7b7;
+  border-color: #065f46;
+}
+
+body.dark .legend-badge.custom-type {
+  background: #431407;
+  color: #fdba74;
+  border-color: #7c2d12;
+}

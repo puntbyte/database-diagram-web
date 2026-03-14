@@ -1,0 +1,264 @@
+/* web/src/styles/widgets/field.css */
+
+/* ── Row shell ─────────────────────────────────────────────────────────────── */
+
+.db-row {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 4px;
+  border-bottom: 1px solid var(--table-border);
+  font-size: 12px;
+  line-height: 1.2;
+  position: relative;
+  transition: background-color 0.15s ease;
+}
+
+.db-row:hover {
+  background-color: rgba(125, 125, 125, .05);
+}
+
+.db-row:last-child {
+  border-bottom: none;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.indexed-row {
+  background: linear-gradient(to right, rgba(var(--header-rgb), .08), transparent);
+}
+
+/* ── Main content row ──────────────────────────────────────────────────────── */
+
+.row-main {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* LEFT: key icon + name — protected from truncation */
+.row-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.field-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* RIGHT: badges + type + default — grows to fill space and shrinks with ellipsis */
+.row-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  flex: 1 1 0;
+  min-width: 0;
+  margin-left: auto;
+  overflow: hidden;
+}
+
+/* ── Type chip ─────────────────────────────────────────────────────────────── */
+
+.type-container {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  flex-shrink: 1;
+}
+
+.field-type {
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-family: 'SF Mono', 'Monaco', 'Menlo', 'Courier New', monospace;
+  font-weight: bold;
+  text-align: center;
+  background: rgba(150, 150, 150, .1);
+  padding: 2px 4px;
+  border-radius: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 40px;
+}
+
+.constrained-type {
+  text-decoration-color: var(--header-bg);
+  text-decoration-thickness: 2px;
+}
+
+/* ── Default value chip ────────────────────────────────────────────────────── */
+/*
+ * Displayed as `= value` immediately after the type chip.
+ * Deliberately different from the type chip:
+ *   • Dashed underline instead of filled background — reads as "annotation"
+ *   • Warm amber tint — visually distinct from the cool gray of the type chip
+ *   • Italic monospace — echoes SQL `DEFAULT` keyword conventionally shown italic
+ *   • flex-shrink:2 — yields space before the type chip does
+ */
+.field-default {
+  font-size: 10px;
+  font-family: 'SF Mono', 'Monaco', 'Menlo', 'Courier New', monospace;
+  font-style: italic;
+  text-align: center;
+  color: #b45309; /* amber-700 */
+  background: rgba(251, 191, 36, .10); /* amber-400 @10% */
+  border: 1px dashed rgba(180, 83, 9, .30);
+  padding: 2px 4px;
+  border-radius: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 2; /* truncates before type chip */
+  min-width: 24px;
+  max-width: 150px;
+}
+
+/* ── Note: full-width below main row ───────────────────────────────────────── */
+
+.field-note {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  padding-left: 20px;
+  line-height: 1.3;
+  opacity: 0.7;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--field-note-max-lines, 2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
+  max-height: calc(1.3em * var(--field-note-max-lines, 2));
+}
+
+/* ── Badges ────────────────────────────────────────────────────────────────── */
+
+.badge {
+  font-size: 8px;
+  height: 14px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.badge.unique {
+  background: #f3e8ff;
+  color: #7e22ce;
+  border: 1px solid rgba(126, 34, 206, .15);
+}
+
+.badge.not-null {
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid rgba(75, 85, 99, .15);
+}
+
+.badge.enum {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid rgba(4, 120, 87, .15);
+}
+
+.badge.custom-type {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid rgba(194, 65, 12, .15);
+}
+
+/* ── Highlight animations ──────────────────────────────────────────────────── */
+
+@keyframes flashHighlight {
+  0% {
+    box-shadow: inset 3px 0 0 var(--header-bg), 0 0 0 rgba(0, 0, 0, 0);
+  }
+  50% {
+    box-shadow: inset 3px 0 0 var(--header-bg), 0 0 12px rgba(var(--header-rgb), .4);
+  }
+  100% {
+    box-shadow: inset 3px 0 0 var(--header-bg), 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+
+.db-row.highlighted {
+  background-color: rgba(var(--header-rgb), .1);
+  animation: flashHighlight 1.5s infinite;
+  z-index: 10;
+}
+
+@keyframes flashTable {
+  0% {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(var(--header-rgb), .6);
+  }
+  100% {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
+  }
+}
+
+.db-table.highlighted {
+  border-color: var(--header-bg);
+  animation: flashTable 1.5s infinite;
+  z-index: 20;
+}
+
+/* ── Dark mode ─────────────────────────────────────────────────────────────── */
+
+body.dark .db-row:hover {
+  background-color: rgba(255, 255, 255, .05);
+}
+
+body.dark .field-type {
+  background: rgba(255, 255, 255, .08);
+  color: #a1a1aa;
+}
+
+/* Default chip: shift to a lighter amber in dark mode for contrast */
+body.dark .field-default {
+  color: #fcd34d; /* amber-300 */
+  background: rgba(251, 191, 36, .08);
+  border-color: rgba(252, 211, 77, .25);
+}
+
+body.dark .badge.unique {
+  background: #3b0764;
+  color: #d8b4fe;
+  border-color: #581c87;
+}
+
+body.dark .badge.not-null {
+  background: #374151;
+  color: #e5e7eb;
+  border-color: #4b5563;
+}
+
+body.dark .badge.enum {
+  background: #064e3b;
+  color: #6ee7b7;
+  border-color: #065f46;
+}
+
+body.dark .badge.custom-type {
+  background: #431407;
+  color: #fdba74;
+  border-color: #7c2d12;
+}

@@ -1,0 +1,183 @@
+/* web/src/styles/widgets/table.css */
+
+.db-table {
+  --table-main-color: var(--header-bg);
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 200px;
+  width: auto;
+  background: var(--table-bg);
+  border: 1px solid var(--table-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  /* FIX: clip children (including the resize handle) to the table's
+   * rounded-rectangle boundary so no hover area bleeds outside */
+  overflow: hidden;
+}
+
+.db-table.dragging, .db-table.resizing {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, .2);
+  z-index: 100;
+  /* Allow the resize handle to remain visible even with overflow:hidden */
+  overflow: visible;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+
+.db-table-header {
+  background-color: var(--table-main-color);
+  color: var(--header-text);
+  padding: 10px;
+  font-weight: bold;
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+  cursor: grab;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  /* ensure the header never bleeds into the resize handle column */
+  padding-right: 18px;
+}
+
+.db-table-header:active {
+  cursor: grabbing;
+}
+
+.header-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.table-icon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  opacity: 0.9;
+}
+
+.title {
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.schema-banner {
+  background: rgba(255, 255, 255, .2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.table-note {
+  font-size: 11px;
+  color: rgba(255, 255, 255, .8);
+  margin-top: 4px;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: var(--table-note-max-lines, 2);
+  -webkit-box-orient: vertical;
+}
+
+/* ── Resize handle ───────────────────────────────────────────────────────
+ *
+ * FIX: The previous handle was `top:0; height:100%` — a full-height strip
+ * on the right edge.  Its rectangular hit-area extended into the transparent
+ * triangle at the rounded top-right corner, creating an invisible hover zone
+ * that appeared to float above the table.
+ *
+ * New design: a small bottom-right corner grip only.
+ *   • 16×40px  — comfortable grab target, standard resize-corner UX.
+ *   • bottom:0; right:0  — anchored to the bottom-right corner.
+ *   • Removed top:0 / height:100%  →  no interference with the header area.
+ *   • overflow:hidden on .db-table clips it to the rounded rectangle in
+ *     normal state (overflow:visible is restored during active resize).
+ */
+.resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 40px;
+  cursor: se-resize;
+  z-index: 50;
+  background: transparent;
+  border-right: 4px solid rgba(0, 0, 0, .1);
+  border-bottom-right-radius: 8px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.resize-handle:hover,
+.db-table.resizing .resize-handle {
+  background-color: rgba(59, 130, 246, .1);
+  border-right: 4px solid var(--header-bg);
+}
+
+/* small diagonal grip lines drawn via CSS to hint at resize affordance */
+.resize-handle::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  background-image: linear-gradient(135deg, transparent 40%, rgba(0, 0, 0, .25) 40%, rgba(0, 0, 0, .25) 55%, transparent 55%),
+  linear-gradient(135deg, transparent 25%, rgba(0, 0, 0, .15) 25%, rgba(0, 0, 0, .15) 40%, transparent 40%);
+  background-size: 100% 100%;
+}
+
+/* ── Semantic zoom overlay ──────────────────────────────────────────────── */
+
+.semantic-overlay {
+  position: absolute;
+  /* FIX: Use inset:0 (same as top/left/right/bottom:0) so the overlay
+   * exactly matches the table boundary with no ±1px bleed.  The previous
+   * -1px values created invisible 1px slivers outside the table that could
+   * receive pointer events in overlay mode. */
+  inset: 0;
+  background-color: var(--table-main-color);
+  color: #fff;
+  border-radius: 8px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease-in-out;
+}
+
+.overlay-text {
+  font-weight: 700;
+  font-size: clamp(12px, calc(15px / var(--zoom, 1)), 56px);
+  word-break: break-word;
+  line-height: 1.2;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+}
+
+.overlay-meta {
+  font-size: clamp(9px, calc(10px / var(--zoom, 1)), 20px);
+  font-weight: 400;
+  opacity: 0.75;
+  margin-top: 3px;
+}
+
+.diagram-canvas.semantic-zoom .semantic-overlay {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: grab;
+}
+
+.diagram-canvas.semantic-zoom .db-table.dragging .semantic-overlay {
+  cursor: grabbing;
+}

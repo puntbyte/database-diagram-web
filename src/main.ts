@@ -3,7 +3,7 @@
 import {Bridge} from './core/communication/bridge.ts';
 import type {ServerMessage, ViewSettings} from './core/communication/protocol.ts';
 import './styles/main.css';
-import {DiagramController} from "./core/diagram/diagram-controller.ts";
+import {DiagramController} from './core/diagram/diagram-controller.ts';
 
 class DiagramApplication {
   private bridge: Bridge;
@@ -28,8 +28,15 @@ class DiagramApplication {
   private initializeController(): DiagramController {
     return new DiagramController(
         'app',
-        (tableName, x, y, width) => this.handleTableMove(tableName, x, y, width),
-        (transform) => this.handleTransformChange(transform)
+        (tableName, x, y, width) => this.bridge.send({
+          type: 'UPDATE_TABLE_POS',
+          tableName,
+          x,
+          y,
+          width
+        }),
+        (_transform) => { /* reserved */
+        }
     );
   }
 
@@ -51,7 +58,7 @@ class DiagramApplication {
         this.controller.loadSchema(message.payload, this.viewSettings);
         break;
       case 'UPDATE_THEME':
-        this.applyTheme(message.theme);
+        document.body.classList.toggle('dark', message.theme === 'dark');
         break;
     }
   }
@@ -61,24 +68,34 @@ class DiagramApplication {
     this.controller.updateVisuals(settings);
   }
 
-  private handleTableMove(tableName: string, x: number, y: number, width?: number): void {
-    this.bridge.send({type: 'UPDATE_TABLE_POS', tableName, x, y, width});
-  }
-
-  private handleTransformChange(_transform: { scale: number; x: number; y: number }): void {
-  }
-
   private setupEventListeners(): void {
     const app = document.getElementById('app');
     if (!app) return;
-    app.addEventListener('note-position-changed', (e: Event) => {
-      const detail = (e as CustomEvent).detail;
-      if (detail) this.bridge.send({type: 'UPDATE_NOTE_POS', ...detail});
-    });
-  }
 
-  private applyTheme(theme: 'dark' | 'light'): void {
-    document.body.classList.toggle('dark', theme === 'dark');
+    // Note drag/resize position saved to YAML
+    app.addEventListener('note-position-changed', (e: Event) => {
+      const d = (e as CustomEvent).detail;
+      if (d) this.bridge.send({
+        type: 'UPDATE_NOTE_POS',
+        name: d.name,
+        x: d.x,
+        y: d.y,
+        width: d.width,
+        height: d.height
+      });
+    });
+
+    // Table colour changed via colour picker — save to YAML
+    app.addEventListener('table-color-changed', (e: Event) => {
+      const d = (e as CustomEvent<{ tableName: string; color: string }>).detail;
+      if (d) this.bridge.send({type: 'UPDATE_TABLE_COLOR', tableName: d.tableName, color: d.color});
+    });
+
+    // Note colour changed via colour picker — save to YAML
+    app.addEventListener('note-color-changed', (e: Event) => {
+      const d = (e as CustomEvent<{ noteId: string; color: string }>).detail;
+      if (d) this.bridge.send({type: 'UPDATE_NOTE_COLOR', noteId: d.noteId, color: d.color});
+    });
   }
 }
 

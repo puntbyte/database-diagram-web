@@ -1,0 +1,45 @@
+/* web/src/styles/ui/tooltip.css
+ *
+ * Global tooltip rendered by tooltip.ts.
+ * Lives on <body> so it escapes any overflow:hidden containers.
+ */
+
+.diagram-tooltip {
+  position: fixed;
+  z-index: 9999;
+  max-width: 320px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  pointer-events: none;        /* never intercepts clicks */
+
+  /* Colours */
+  background: var(--tooltip-bg, #1e293b);
+  color: var(--tooltip-text, #f8fafc);
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 4px 16px rgba(0,0,0,.3);
+
+  /* Hidden by default */
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity .15s ease, transform .15s ease;
+}
+
+.diagram-tooltip--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Light mode override */
+body:not(.dark) .diagram-tooltip {
+  background: var(--tooltip-bg-light, #1e293b);
+  color: #f1f5f9;
+}
+
+/* Dark mode — already dark background, slightly lighter border */
+body.dark .diagram-tooltip {
+  border-color: rgba(255,255,255,.12);
+}

@@ -1,0 +1,162 @@
+/* web/src/styles/ui/color-picker.css */
+
+/* ── Three-dot menu button ───────────────────────────────────────────────── */
+
+.entity-menu-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.entity-menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: rgba(255, 255, 255, .15);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+  transition: opacity .15s, background .15s;
+  flex-shrink: 0;
+}
+
+.entity-menu-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, .3);
+}
+
+/* Note variant */
+.note-menu-wrap {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 20;
+}
+
+.note-menu-wrap .entity-menu-btn {
+  background: rgba(0, 0, 0, .08);
+  color: inherit;
+}
+
+body.dark .note-menu-wrap .entity-menu-btn {
+  background: rgba(255, 255, 255, .1);
+}
+
+/* ── Colour picker popup ─────────────────────────────────────────────────── */
+
+.cp-popup {
+  /*
+   * Default (non-portal): absolute positioning inside its container.
+   */
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 3000;
+
+  background: var(--table-bg, #fff);
+  border: 1px solid var(--table-border, #e2e8f0);
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+  width: 156px;
+
+  display: none;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity .15s ease, transform .15s ease;
+  pointer-events: none;
+}
+
+/*
+ * FIX: Portal mode — popup is appended to <body> and positioned with JS via
+ * fixed coordinates, so it is never clipped by overflow:hidden on ancestor
+ * elements (tables, notes).  The JS sets top/left after open().
+ */
+.cp-popup.cp-portal {
+  position: fixed;
+  top: -9999px;
+  left: -9999px;
+}
+
+.cp-popup.cp-open {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Swatch grid: 4 columns */
+.cp-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.cp-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, .1);
+  cursor: pointer;
+  padding: 0;
+  transition: transform .1s, box-shadow .1s;
+}
+
+.cp-swatch:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+  position: relative;
+  z-index: 1;
+}
+
+.cp-sep {
+  height: 1px;
+  background: var(--table-border, #e2e8f0);
+  margin: 8px 0;
+}
+
+.cp-custom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cp-custom-label {
+  font-size: 11px;
+  color: var(--text-secondary, #64748b);
+  white-space: nowrap;
+}
+
+.cp-custom-input {
+  width: 32px;
+  height: 28px;
+  border-radius: 5px;
+  border: 1px solid var(--table-border, #e2e8f0);
+  padding: 2px;
+  cursor: pointer;
+  background: none;
+}
+
+body.dark .cp-popup {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+}
+
+body.dark .cp-swatch {
+  border-color: rgba(255, 255, 255, .08);
+}
+
+/* ── Header right section ───────────────────────────────────────────────── */
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}

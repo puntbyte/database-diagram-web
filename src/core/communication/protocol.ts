@@ -13,13 +13,9 @@ export interface ViewSettings {
   lineStyle: string;
   showGrid: boolean;
   gridSize: number;
-  /** Show the table-header doc comment note */
   showTableNotes: boolean;
-  /** Show column/field doc comment notes */
   showFieldNotes: boolean;
-  /** Max lines to show for table notes (0 = unlimited) */
   tableNoteMaxLines: number;
-  /** Max lines to show for field notes (0 = unlimited) */
   fieldNoteMaxLines: number;
 }
 
@@ -39,7 +35,6 @@ export interface ThemeUpdateMessage {
   theme: 'dark' | 'light';
 }
 
-// FIX: Kotlin serialises UpdateGlobalSettings with flat top-level properties.
 export interface SettingsUpdateMessage {
   type: 'UPDATE_GLOBAL_SETTINGS';
   lineStyle: string;
@@ -55,7 +50,9 @@ export type ClientMessage =
     | LogMessage
     | ReadyMessage
     | TablePositionUpdateMessage
-    | NotePositionUpdateMessage;
+    | NotePositionUpdateMessage
+    | TableColorUpdateMessage
+    | NoteColorUpdateMessage;
 
 export interface LogMessage {
   type: 'LOG';
@@ -82,4 +79,18 @@ export interface NotePositionUpdateMessage {
   y: number;
   width: number;
   height: number;
+}
+
+export interface TableColorUpdateMessage {
+  type: 'UPDATE_TABLE_COLOR';
+  /** The table's raw SQL name (same as data-table-name on the DOM element). */
+  tableName: string;
+  color: string;
+}
+
+export interface NoteColorUpdateMessage {
+  type: 'UPDATE_NOTE_COLOR';
+  /** The note's `id` field from the YAML. */
+  noteId: string;
+  color: string;
 }

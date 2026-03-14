@@ -2,6 +2,12 @@
 
 .db-table {
   --table-main-color: var(--header-bg);
+  /* FIX: --table-header-text defaults to the theme's header text colour.
+   * When a custom colour is applied via the picker, table-widget.ts computes
+   * a contrasting black/white and sets this variable inline so the text stays
+   * readable on any background hue. */
+  --table-header-text: var(--header-text);
+
   position: absolute;
   top: 0;
   left: 0;
@@ -14,35 +20,31 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
-  /* FIX: clip children (including the resize handle) to the table's
-   * rounded-rectangle boundary so no hover area bleeds outside */
   overflow: hidden;
 }
 
-.db-table.dragging, .db-table.resizing {
+.db-table.dragging,
+.db-table.resizing {
   box-shadow: 0 10px 15px rgba(0, 0, 0, .2);
   z-index: 100;
-  /* Allow the resize handle to remain visible even with overflow:hidden */
-  overflow: visible;
 }
 
-/* ── Header ─────────────────────────────────────────────────────────────── */
+/* ── Header ──────────────────────────────────────────────────────────────── */
 
 .db-table-header {
   background-color: var(--table-main-color);
-  color: var(--header-text);
-  padding: 10px;
+  /* FIX: Use the computed contrast variable instead of the fixed theme colour */
+  color: var(--table-header-text);
+  padding: 8px;
   font-weight: bold;
-  border-top-left-radius: 7px;
-  border-top-right-radius: 7px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
   cursor: grab;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px;
-  /* ensure the header never bleeds into the resize handle column */
-  padding-right: 18px;
+  gap: 2px;
 }
 
 .db-table-header:active {
@@ -53,6 +55,13 @@
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
 .table-icon {
@@ -68,16 +77,16 @@
 }
 
 .schema-banner {
-  background: rgba(255, 255, 255, .2);
+  background: rgba(0, 0, 0, .18);
   padding: 2px 6px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .table-note {
   font-size: 11px;
-  color: rgba(255, 255, 255, .8);
-  margin-top: 4px;
+  color: inherit;
+  opacity: 0.85;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -86,32 +95,21 @@
   -webkit-box-orient: vertical;
 }
 
-/* ── Resize handle ───────────────────────────────────────────────────────
- *
- * FIX: The previous handle was `top:0; height:100%` — a full-height strip
- * on the right edge.  Its rectangular hit-area extended into the transparent
- * triangle at the rounded top-right corner, creating an invisible hover zone
- * that appeared to float above the table.
- *
- * New design: a small bottom-right corner grip only.
- *   • 16×40px  — comfortable grab target, standard resize-corner UX.
- *   • bottom:0; right:0  — anchored to the bottom-right corner.
- *   • Removed top:0 / height:100%  →  no interference with the header area.
- *   • overflow:hidden on .db-table clips it to the rounded rectangle in
- *     normal state (overflow:visible is restored during active resize).
- */
+/* ── Resize handle — full right side ─────────────────────────────────────── */
+
 .resize-handle {
   position: absolute;
-  bottom: 0;
+  top: 0;
   right: 0;
-  width: 16px;
-  height: 40px;
-  cursor: se-resize;
+  width: 12px;
+  height: 100%;
+  cursor: col-resize;
   z-index: 50;
   background: transparent;
   border-right: 4px solid rgba(0, 0, 0, .1);
+  transition: background-color .2s, border-color .2s;
+  border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
-  transition: background-color 0.2s, border-color 0.2s;
 }
 
 .resize-handle:hover,
@@ -120,30 +118,13 @@
   border-right: 4px solid var(--header-bg);
 }
 
-/* small diagonal grip lines drawn via CSS to hint at resize affordance */
-.resize-handle::after {
-  content: '';
-  position: absolute;
-  bottom: 6px;
-  right: 2px;
-  width: 8px;
-  height: 8px;
-  background-image: linear-gradient(135deg, transparent 40%, rgba(0, 0, 0, .25) 40%, rgba(0, 0, 0, .25) 55%, transparent 55%),
-  linear-gradient(135deg, transparent 25%, rgba(0, 0, 0, .15) 25%, rgba(0, 0, 0, .15) 40%, transparent 40%);
-  background-size: 100% 100%;
-}
-
-/* ── Semantic zoom overlay ──────────────────────────────────────────────── */
+/* ── Semantic zoom overlay ───────────────────────────────────────────────── */
 
 .semantic-overlay {
   position: absolute;
-  /* FIX: Use inset:0 (same as top/left/right/bottom:0) so the overlay
-   * exactly matches the table boundary with no ±1px bleed.  The previous
-   * -1px values created invisible 1px slivers outside the table that could
-   * receive pointer events in overlay mode. */
   inset: 0;
   background-color: var(--table-main-color);
-  color: #fff;
+  color: var(--table-header-text);
   border-radius: 8px;
   z-index: 200;
   display: flex;
@@ -162,7 +143,7 @@
   font-size: clamp(12px, calc(15px / var(--zoom, 1)), 56px);
   word-break: break-word;
   line-height: 1.2;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .2);
 }
 
 .overlay-meta {

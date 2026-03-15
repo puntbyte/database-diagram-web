@@ -27,7 +27,7 @@
 .relation-line-base {
   fill: none;
   stroke: var(--line-color);
-  stroke-width: 2px;
+  stroke-width: 2.5px;
   stroke-linecap: round;
   transition: stroke 0.3s, stroke-width 0.3s;
 }
@@ -52,7 +52,7 @@
 .relationship-group.overlay .relation-line-base,
 .relationship-group.overlay .relation-line-flow {
   vector-effect: non-scaling-stroke;
-  stroke-width: 2px;
+  stroke-width: 4px;
 }
 
 /* ── Animations ─────────────────────────────────────────────────────────────── */

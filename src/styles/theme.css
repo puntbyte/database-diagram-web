@@ -9,8 +9,8 @@
   --header-rgb: 59, 130, 246;
   --header-text: #ffffff;
   --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --line-color: #9ca3af;
+  --text-secondary: #9a9cac;
+  --line-color: #b8c1cf;
   --grid-line: rgba(0, 0, 0, 0.04);
   --axis-line: rgba(0, 0, 0, 0.08);
 }
@@ -22,8 +22,8 @@ body.dark {
   --header-bg: #3574f0;
   --header-rgb: 53, 116, 240;
   --header-text: #ffffff;
-  --text-primary: #d1d5db;
-  --text-secondary: #9ca3af;
+  --text-primary: #e0e5ed;
+  --text-secondary: #cbced5;
   --line-color: #6b7280;
   --grid-line: rgba(255, 255, 255, 0.04);
   --axis-line: rgba(255, 255, 255, 0.08);

@@ -12,7 +12,7 @@
   background: var(--table-bg);
   border: 1px solid var(--table-border);
   border-radius: 8px;
-  padding: 6px 10px;
+  padding: 6px 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
   z-index: 1000;
   pointer-events: auto;
